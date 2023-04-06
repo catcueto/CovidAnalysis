@@ -62,13 +62,39 @@ WHERE continent IS NOT NULL
 GROUP BY continent 
 ORDER BY totalDeathCount desc
 
+-- 1.
 -- Global STATS, TOTAL CASES
-SELECT SUM(new_cases) AS total_cases, SUM(CAST(new_deaths AS int)) AS total_deaths, SUM(CAST(new_deaths AS int))/SUM(new_cases)*100 AS globalDeathPercentage
+
+SELECT SUM(new_cases) AS total_cases, SUM(CAST(new_deaths AS int)) AS totalDeaths, SUM(CAST(new_deaths AS int))/SUM(new_cases)*100 AS globalDeathPercentage
 FROM Covid19Project..CovidDeaths$
 WHERE continent IS NOT NULL
 --GROUP BY date
 ORDER BY 1,2
 
+-- 2. Total Deaths Based on Continent
+
+SELECT Location, SUM(CAST(new_deaths AS int)) AS total_deaths
+FROM Covid19Project..CovidDeaths$
+WHERE continent IS NULL
+AND location NOT IN ('World', 'European Union', 'International', 'High income', 'Upper middle income', 'Lower middle income', 'Low income')
+GROUP BY location
+ORDER BY total_deaths desc
+
+
+--3. Population Infected
+SELECT Location, Population, MAX(total_cases) AS HighestInfectionCount, MAX(total_cases/population)*100 AS PercentPopulationInfected
+FROM Covid19Project..CovidDeaths$
+-- WHERE location like '%states%'
+GROUP BY location, population
+ORDER BY PercentPopulationInfected desc
+
+
+--4. 
+SELECT Location, Population, date, MAX(total_cases) AS HighestInfectionCount, MAX(total_cases/population)*100 AS PercentPopulationInfected
+FROM Covid19Project..CovidDeaths$
+--WHERE location like '%states%'
+GROUP BY Location, Population, date
+ORDER BY PercentPopulationInfected desc
 
 -- JOINING DEATHS AND VACCINES TABLES TOGETHER
 SELECT *
